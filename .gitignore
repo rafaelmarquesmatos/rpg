@@ -1,0 +1,8 @@
+node_modules
+dist
+material
+
+# segredos
+.env
+.env.*
+!.env.example
