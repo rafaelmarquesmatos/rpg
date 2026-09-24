@@ -16,6 +16,21 @@ export default class Provedor {
                         role: m.papel === "usuario" ? "user" : m.papel === "assistente" ? "assistant" : "system",
                         content: m.conteudo,
                     })),
+                    tools: [
+                        {
+                            type: "function",
+                            function: {
+                                name: "rolarDado",
+                                description: "Rola um dado",
+                                parameters: {
+                                    type: "object",
+                                    properties: {
+                                        faces: { "type": "number" }
+                                    }
+                                }
+                            }
+                        }
+                    ]
                 })
             }
         )
