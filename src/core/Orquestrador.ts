@@ -1,4 +1,4 @@
-import Ferramentas from "./Ferramentas.js";                             //ações que a IA pode solicitar
+import Ferramentas from "../core/Ferramentas.js";                             //ações que a IA pode solicitar
 import type { Mensagem, RespostaProvedor } from "./Interfaces.js";      //formato dos dados
 import Provedor from "./Provedor.js";                                   //comunicação com o provedor
 import Transcritor from "./Transcritor.js";                             //historico de conversas e mensagens

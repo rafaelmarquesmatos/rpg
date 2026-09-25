@@ -1,0 +1,15 @@
+{
+    "type": "function",
+    "function": {
+        "name": "rolarDado",
+        "description": "Rola um dado",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "faces": {
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

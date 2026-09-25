@@ -1,4 +1,5 @@
-import type { Mensagem, RespostaProvedor } from "./Interfaces.js";
+import type { Mensagem, RespostaProvedor } from "./Interfaces.js"
+import ferramentas from "../json/ferramentas.json" with { type: "json" }
 
 export default class Provedor {
     /**
@@ -39,35 +40,7 @@ export default class Provedor {
                         content: m.conteudo, // pega o conteúdo da mensagem e passa para content
                     })),
 
-                    tools: [
-                        {
-                            type: "function",
-                            function: {
-                                name: "rolarDado",
-                                description: "Rola um dado",
-                                parameters: {
-                                    type: "object",
-                                    properties: {
-                                        faces: { "type": "number" }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            type: "function",
-                            function: {
-                                name: "soma",
-                                description: "soma dois numeros kkk",
-                                parameters: {
-                                    type: "object",
-                                    properties: {
-                                        n1: { "type": "number" },
-                                        n2: { "type": "number" }
-                                    }
-                                }
-                            }
-                        }
-                    ]
+                    tools: [ferramentas]
                 })
             }
         )
