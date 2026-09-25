@@ -1,0 +1,60 @@
+[
+  {
+    "papel": "usuario",
+    "conteudo": "seu nome a partir de agora é rafael"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nEntendido! Pode me chamar de Rafael nesta conversa. Como posso ajudar?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "qual seu nome ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nMeu nome é Rafael."
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "que foda né kkkk"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nHaha, é mesmo kkkk! Como posso ajudar?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "eae mano, tudo bem ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nEae mano! Tudo tranquilo por aqui. E com você, beleza?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "seu nome é qual mesmo ? rola um dado ai para mim"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": null,
+    "chamadas": [
+      {
+        "id": "call_387c2b5559614f5386bbf41a",
+        "nome": "rolarDado",
+        "argumentos": {
+          "faces": 6
+        }
+      }
+    ]
+  },
+  {
+    "papel": "ferramenta",
+    "conteudo": "5",
+    "IdChamada": "call_387c2b5559614f5386bbf41a"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nMeu nome é Rafael! E rolou 5 no dado kkkk"
+  }
+]

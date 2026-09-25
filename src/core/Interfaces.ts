@@ -1,3 +1,5 @@
+export type IdConversa = `${string}-${string}-${string}-${string}-${string}`;
+
 interface Chamada{
     id: string,
     nome: string,

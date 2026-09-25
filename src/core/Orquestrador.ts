@@ -1,6 +1,6 @@
 import Ferramentas from "../core/Ferramentas.js";                             //ações que a IA pode solicitar
 import Debug from "./debug/Debug.js";
-import type { Mensagem, RespostaProvedor } from "./Interfaces.js";      //formato dos dados
+import type { IdConversa, Mensagem, RespostaProvedor } from "./Interfaces.js";      //formato dos dados
 import Provedor from "./Provedor.js";                                   //comunicação com o provedor
 import Transcritor from "./Transcritor.js";                             //historico de conversas e mensagens
 
@@ -11,8 +11,8 @@ export default class Orquestrador {
     mensagem: Mensagem            //classe statica responsável por executar ações solicitadas pelo modelo.
     log: boolean
 
-    constructor() {
-        this.transcritor = new Transcritor()
+    constructor(idConversa?: IdConversa) {
+        this.transcritor = new Transcritor(idConversa)
         this.provedor = new Provedor()
         this.ferramentas = new Ferramentas()
 

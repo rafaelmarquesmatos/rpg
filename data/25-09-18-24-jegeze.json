@@ -1,0 +1,26 @@
+[
+  {
+    "papel": "usuario",
+    "conteudo": "eae  ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nE aí! Tudo bem? Como posso ajudar você hoje?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "como voce ta meu mano ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nTô bem, obrigado! E aí, como é que tá por aí? Em que posso ajudar?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "tudo de boa na lagoa ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nTudo tranquilo na lagoa sim! E contigo, como é que tá?"
+  }
+]
