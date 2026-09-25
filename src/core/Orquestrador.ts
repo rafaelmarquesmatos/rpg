@@ -1,31 +1,49 @@
 import Ferramentas from "../core/Ferramentas.js";                             //ações que a IA pode solicitar
+import Debug from "./debug/Debug.js";
 import type { Mensagem, RespostaProvedor } from "./Interfaces.js";      //formato dos dados
 import Provedor from "./Provedor.js";                                   //comunicação com o provedor
 import Transcritor from "./Transcritor.js";                             //historico de conversas e mensagens
 
 export default class Orquestrador {
-    mensagem: Mensagem                  //representa a mensagem recebida pelo usuario.
     transcritor: Transcritor            //classe responsável pelo contexto.
     provedor: Provedor                  //classe responsável por conversar com o modelo de IA.
-    ferramentas: Ferramentas            //classe statica responsável por executar ações solicitadas pelo modelo.
+    ferramentas: Ferramentas
+    mensagem: Mensagem            //classe statica responsável por executar ações solicitadas pelo modelo.
+    log: boolean
 
-    constructor(mensagem: Mensagem) {
-        this.mensagem = mensagem
+    constructor() {
         this.transcritor = new Transcritor()
         this.provedor = new Provedor()
         this.ferramentas = new Ferramentas()
 
-        this.executar();
+        this.mensagem = {
+            papel: 'usuario'
+        }
+
+        this.log = true
+    }
+
+    // * Função responsavel por receber a mensagem do usuario
+    public receberMensagem(conteudo: string) {
+        this.mensagem = {
+            papel: "usuario",
+            conteudo
+        }
+
+        Debug.print(`Mensagem do usuario: ${conteudo}`)
+
+        this.executar()
     }
 
     // * Função responsavel por salvar a mensagem do usuario a cada interação
-    salvarMensagem() //usa o metodo do transcritor para armazenar a mensagem que o Orquestrador recebeu no transcritor
+    private salvarMensagem() //usa o metodo do transcritor para armazenar a mensagem que o Orquestrador recebeu no transcritor
     {
         this.transcritor.adicionar(this.mensagem)
+        Debug.print(`Salvando no transcritor: ${JSON.stringify(this.mensagem, null, 2)}`)
     }
 
     // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
-    async perguntarProvedor() {
+    private async perguntarProvedor() {
         const respostaProvedor = await this.provedor.perguntar(this.transcritor.receber())
         return respostaProvedor
         /*
@@ -36,7 +54,7 @@ export default class Orquestrador {
     }
 
     // ! tentar tirar o maximo possivel de ? e !
-    registrarResposta(resposta: RespostaProvedor) //Receber a resposta do Provedor, extrair a mensagem da IA, salvar essa mensagem no histórico e verificar se a IA pediu alguma ferramenta.
+    private registrarResposta(resposta: RespostaProvedor) //Receber a resposta do Provedor, extrair a mensagem da IA, salvar essa mensagem no histórico e verificar se a IA pediu alguma ferramenta.
     {
         const mensagem = resposta.choices[0]?.message
         /*
@@ -59,8 +77,11 @@ export default class Orquestrador {
                 }
                 : {}),
         })
-        console.log(mensagem?.content)              //exibe a resposta do assistente (IA)
-        // console.log(this.transcritor.receber())     //exibe o historico de mensagens
+
+        if (mensagem?.content) {
+            console.log(mensagem?.content) //exibe a resposta do assistente (IA)
+            Debug.print(`Resposta do assistente: ${mensagem?.content}`)
+        }
 
         if (mensagem?.tool_calls) {
             // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
@@ -72,7 +93,7 @@ export default class Orquestrador {
     }
 
     // ! tentar tirar o maximo possivel de ? e !
-    registrarFerramenta(mensagem: RespostaProvedor["choices"][number]["message"] | undefined) {
+    private registrarFerramenta(mensagem: RespostaProvedor["choices"][number]["message"] | undefined) {
         const chamada = mensagem?.tool_calls?.[0]       //armazena a primeira chamada de tool_calls
         const nome = chamada?.function.name;
 
@@ -87,18 +108,20 @@ export default class Orquestrador {
             chamada.function.arguments,
             chamada.id
         )
-        console.log(resultadoFerramenta?.resultado)
+
+        Debug.print(`Resultado da chamada de ferramentas ${resultadoFerramenta?.resultado}`)
 
         this.transcritor.adicionar({        //chama o transcritor para armazenar esse resultado no contexto
             papel: 'ferramenta',
             conteudo: resultadoFerramenta?.resultado!,
             IdChamada: chamada.id
         })
-        console.log(JSON.stringify(mensagem?.tool_calls, null, 2))
+
+        Debug.print(JSON.stringify(mensagem?.tool_calls, null, 2))
     }
 
     // * Responsavel por executar toda a sequencia de interações 
-    async executar() {
+    private async executar() {
         // Salvamos a mensagem do usuario
         this.salvarMensagem()
 
@@ -108,5 +131,7 @@ export default class Orquestrador {
 
             if (!temFerramenta) break
         }
+
+        Debug.print('While do orquestrador finalizado', true)
     }
 }

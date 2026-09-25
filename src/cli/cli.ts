@@ -5,13 +5,10 @@ import Orquestrador from "../core/Orquestrador.js";
 export async function iniciar() {
     const rl = createInterface({ input, output })
 
-    while (true) {
-        const conteudo = await rl.question("")
+    const orquestrador = new Orquestrador()
 
-        const construtor = new Orquestrador({
-            papel: 'usuario',
-            conteudo
-        })
+    while (true) {
+        orquestrador.receberMensagem(await rl.question(""))
     }
 
     rl.close()
