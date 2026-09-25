@@ -26,7 +26,8 @@ export default class Orquestrador {
 
     // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
     async perguntarProvedor() {
-        return await this.provedor.perguntar(this.transcritor.receber())
+        const respostaProvedor = await this.provedor.perguntar(this.transcritor.receber())
+        return respostaProvedor
         /*
             *(this.provedor.perguntar) pede o historico ao transcritor e faz a requisição HTTP para a API
             *(this.transcritor.receber()) fornece o historico de mensagen para o provedor
@@ -34,6 +35,7 @@ export default class Orquestrador {
         */
     }
 
+    // ! tentar tirar o maximo possivel de ? e !
     registrarResposta(resposta: RespostaProvedor) //Receber a resposta do Provedor, extrair a mensagem da IA, salvar essa mensagem no histórico e verificar se a IA pediu alguma ferramenta.
     {
         const mensagem = resposta.choices[0]?.message
@@ -43,24 +45,40 @@ export default class Orquestrador {
         */
 
 
+        // ! precisa de uma melhoria aqui
         this.transcritor.adicionar({        // guarda o texto do assistente
             papel: 'assistente',            //role: assistant
-            conteudo: mensagem?.content!    //"!" declara que sabemos que não sera null, confia...
+            conteudo: mensagem?.content!,   //"!" declara que sabemos que não sera null, confia...
+            ...(mensagem?.tool_calls
+                ? {
+                    chamadas: mensagem.tool_calls.map((c) => ({
+                        id: c.id,
+                        nome: c.function.name,
+                        argumentos: JSON.parse(c.function.arguments) as Record<string, unknown>,
+                    })),
+                }
+                : {}),
         })
         console.log(mensagem?.content)              //exibe a resposta do assistente (IA)
-        console.log(this.transcritor.receber())     //exibe o historico de mensagens
+        // console.log(this.transcritor.receber())     //exibe o historico de mensagens
 
-        // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
-        this.registrarFerramenta(mensagem)      // se o modelo pediu uma ferramenta, executa e guarda o resultado
+        if (mensagem?.tool_calls) {
+            // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
+            this.registrarFerramenta(mensagem)
+            return true      // se o modelo pediu uma ferramenta, executa e guarda o resultado
+        }
+
+        return false
     }
 
+    // ! tentar tirar o maximo possivel de ? e !
     registrarFerramenta(mensagem: RespostaProvedor["choices"][number]["message"] | undefined) {
         const chamada = mensagem?.tool_calls?.[0]       //armazena a primeira chamada de tool_calls
         const nome = chamada?.function.name;
 
         //se chamada for false encerra o metodo
         if (!chamada) return
-        //verifica se a chave usada para chaar a ferramenta existe em ferramentas e afirma que nao var ser undefined
+        //verifica se a chave usada para chamar a ferramenta existe em ferramentas e afirma que nao var ser undefined
         if (!(nome! in Ferramentas.funcoes)) return "ferramenta invalida :("
 
         //passa os parametros de execução da ferramenta e se der tudo certo armazena na variavel
@@ -73,16 +91,22 @@ export default class Orquestrador {
 
         this.transcritor.adicionar({        //chama o transcritor para armazenar esse resultado no contexto
             papel: 'ferramenta',
-            conteudo: resultadoFerramenta?.resultado!
+            conteudo: resultadoFerramenta?.resultado!,
+            IdChamada: chamada.id
         })
         console.log(JSON.stringify(mensagem?.tool_calls, null, 2))
     }
 
     // * Responsavel por executar toda a sequencia de interações 
-    async executar()
-    {
+    async executar() {
+        // Salvamos a mensagem do usuario
         this.salvarMensagem()
-        const resposta = await this.perguntarProvedor()
-        this.registrarResposta(resposta)
+
+        while (true) {
+            const resposta = await this.perguntarProvedor()
+            const temFerramenta = this.registrarResposta(resposta)
+
+            if (!temFerramenta) break
+        }
     }
 }

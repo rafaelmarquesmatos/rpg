@@ -9,6 +9,8 @@ export default class Provedor {
      * @returns 
      */
     async perguntar(mensagem: Mensagem[]): Promise<RespostaProvedor> {
+        const mensagens = mensagem.map((m) => this.montarMensagem(m))
+        
         const resposta = await fetch(
             'https://openrouter.ai/api/v1/chat/completions',
             // O fetch() inicia a requisição HTTP e retorna uma Promise<Response>.
@@ -29,17 +31,7 @@ export default class Provedor {
                     * transforma em um formato de dados da API externa e coloca em um novo array
                     * que será convertido em JSON.
                     */
-                    messages: mensagem.map((m) => ({
-                        role:
-                            m.papel === "usuario"
-                                ? "user"
-                                : m.papel === "assistente"
-                                    ? "assistant"
-                                    : "system",
-
-                        content: m.conteudo, // pega o conteúdo da mensagem e passa para content
-                    })),
-
+                    messages: mensagens,
                     tools: [ferramentas]
                 })
             }
@@ -58,5 +50,34 @@ export default class Provedor {
         * transforma em objeto JS, trata como RespostaProvedor
         * e devolve para quem chamou perguntar().
         */
+    }
+
+    montarMensagem(m: Mensagem) {
+        if (m.papel === "usuario") {
+            return { role: "user", content: m.conteudo ?? "" }
+        }
+
+        if (m.papel === "sistema") {
+            return { role: "system", content: m.conteudo ?? ""}
+        }
+        
+        if (m.papel === "ferramenta") {
+            return { role: "tool", tool_call_id: m.IdChamada ?? "", content: m.conteudo ?? "" }
+        }
+
+        if (m.chamadas) {
+            const tool_calls = m.chamadas.map((c) => ({
+                id: c.id,
+                type: "function" as const,
+                function: {
+                    name: c.nome,
+                    arguments: JSON.stringify(c.argumentos)
+                }
+            }))
+
+            return { role: "assistant", content: null, tool_calls }
+        }
+
+        return { role: "assistant", content: m.conteudo ?? "" }
     }
 }
