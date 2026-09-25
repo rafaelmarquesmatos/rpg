@@ -1,11 +1,12 @@
 import type { Mensagem, RespostaProvedor } from "./Interfaces.js";
 
 export default class Provedor {
-    /*
-    * perguntar(mensagem: Mensagem[]) recebe um array de objetos Mensagem.
-    * Promise<RespostaProvedor> indica que a função retornará uma
-    * RespostaProvedor de forma assíncrona.
-    */
+    /**
+     * * perguntar(mensagem: Mensagem[]) recebe um array de objetos Mensagem.
+     * * Promise<RespostaProvedor> indica que a função retornará uma respostaProvedor de forma assíncrona.
+     * @param mensagem 
+     * @returns 
+     */
     async perguntar(mensagem: Mensagem[]): Promise<RespostaProvedor> {
         const resposta = await fetch(
             'https://openrouter.ai/api/v1/chat/completions',
@@ -18,10 +19,7 @@ export default class Provedor {
                     'Content-Type': 'application/json', // informa ao servidor que o conteúdo do body está sendo enviado no formato JSON.
                 },
 
-                /*
-                * Monta os dados que serão enviados para a IA,
-                * converte esse objeto JS em JSON e coloca no corpo da requisição HTTP.
-                */
+                //monta os dados que serão enviados para a IA, converte esse objeto JS em JSON e coloca no corpo da requisição HTTP.
                 body: JSON.stringify({
                     model: 'inception/mercury-2.5', // determina o modelo que irá processar a requisição
 
@@ -35,8 +33,8 @@ export default class Provedor {
                             m.papel === "usuario"
                                 ? "user"
                                 : m.papel === "assistente"
-                                ? "assistant"
-                                : "system",
+                                    ? "assistant"
+                                    : "system",
 
                         content: m.conteudo, // pega o conteúdo da mensagem e passa para content
                     })),
@@ -54,13 +52,28 @@ export default class Provedor {
                                     }
                                 }
                             }
+                        },
+                        {
+                            type: "function",
+                            function: {
+                                name: "soma",
+                                description: "soma dois numeros kkk",
+                                parameters: {
+                                    type: "object",
+                                    properties: {
+                                        n1: { "type": "number" },
+                                        n2: { "type": "number" }
+                                    }
+                                }
+                            }
                         }
                     ]
                 })
             }
         )
 
-        if (!resposta.ok) { // se a resposta falhou, lança o erro para quem chamou perguntar()
+        // se a resposta falhou, lança o erro para quem chamou perguntar()+
+        if (!resposta.ok) {
             throw new Error(
                 `OpenRouter ${resposta.status}: ${await resposta.text()}`
             ); // cria um objeto Error e lança esse erro para quem chamou perguntar()

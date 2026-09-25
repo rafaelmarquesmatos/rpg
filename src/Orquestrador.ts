@@ -1,17 +1,15 @@
-import type { KeyObject } from "node:crypto";
 import Ferramentas from "./Ferramentas.js";                             //ações que a IA pode solicitar
 import type { Mensagem, RespostaProvedor } from "./Interfaces.js";      //formato dos dados
 import Provedor from "./Provedor.js";                                   //comunicação com o provedor
 import Transcritor from "./Transcritor.js";                             //historico de conversas e mensagens
 
 export default class Orquestrador {
-    mensagem: Mensagem                  //representa a mensagem recebida.
-    transcritor: Transcritor            //objeto responsável pelo histórico.
-    provedor: Provedor                  //objeto responsável por conversar com o modelo de IA.
-    ferramentas: Ferramentas            //objeto responsável por executar ações solicitadas pelo modelo.
+    mensagem: Mensagem                  //representa a mensagem recebida pelo usuario.
+    transcritor: Transcritor            //classe responsável pelo contexto.
+    provedor: Provedor                  //classe responsável por conversar com o modelo de IA.
+    ferramentas: Ferramentas            //classe statica responsável por executar ações solicitadas pelo modelo.
 
-    constructor(mensagem: Mensagem)  //construtor recebe um objeto de acordo com o formato de Mensagen
-    {  
+    constructor(mensagem: Mensagem) {
         this.mensagem = mensagem
         this.transcritor = new Transcritor()
         this.provedor = new Provedor()
@@ -20,11 +18,13 @@ export default class Orquestrador {
         this.executar();
     }
 
-    salvarMensagem() //usa o metodo do transcritor para armazena a mensagem que o Orquestrador recebeu no trasncritor
+    // * Função responsavel por salvar a mensagem do usuario a cada interação
+    salvarMensagem() //usa o metodo do transcritor para armazenar a mensagem que o Orquestrador recebeu no transcritor
     {
-        this.transcritor.adicionar(this.mensagem)      
+        this.transcritor.adicionar(this.mensagem)
     }
 
+    // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
     async perguntarProvedor() {
         return await this.provedor.perguntar(this.transcritor.receber())
         /*
@@ -33,24 +33,16 @@ export default class Orquestrador {
             *(await) faz esperar ja que a requisição pode demorar
         */
     }
-    
-    async executar() // guarda a fala do usuario e pede a resposta
-    {
-        this.salvarMensagem()   //guarda a mensagem do usuario
-        const resposta = await this.perguntarProvedor() //pega o historico e manda para IA, quando a IA responder esse resultado vai para (resposta)
-        this.registrarResposta(resposta)    //entrega para ser processada
-    }
 
     registrarResposta(resposta: RespostaProvedor) //Receber a resposta do Provedor, extrair a mensagem da IA, salvar essa mensagem no histórico e verificar se a IA pediu alguma ferramenta.
     {
         const mensagem = resposta.choices[0]?.message
-            /*
-                (resposta.choices[0]) pega o primeiro elemento do array choices
-                (.message) declara para pegar o content do array
-                (?) proteje caso seja undefined
-            */
+        /*
+            (resposta.choices[0]) pega o primeiro elemento do array choices
+            (.message) declara para pegar o content do array
+        */
 
-         
+
         this.transcritor.adicionar({        // guarda o texto do assistente
             papel: 'assistente',            //role: assistant
             conteudo: mensagem?.content!    //"!" declara que sabemos que não sera null, confia...
@@ -58,27 +50,39 @@ export default class Orquestrador {
         console.log(mensagem?.content)              //exibe a resposta do assistente (IA)
         console.log(this.transcritor.receber())     //exibe o historico de mensagens
 
+        // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
         this.registrarFerramenta(mensagem)      // se o modelo pediu uma ferramenta, executa e guarda o resultado
     }
 
     registrarFerramenta(mensagem: RespostaProvedor["choices"][number]["message"] | undefined) {
-        const chamada = mensagem?.tool_calls?.[0]       //armazena em chamda a primeira chamda de tool_calls se houver
+        const chamada = mensagem?.tool_calls?.[0]       //armazena a primeira chamada de tool_calls
         const nome = chamada?.function.name;
-        
-        if (!chamada) return        //se chamada for false encerra o metodo
-        if ( !(nome! in Ferramentas.funcoes) ) return "ferramenta invalida :("     //verifica se a chave usada para chamar a ferramenta existe em ferramentas e afirma que nao var ser undefined
 
-        const resultadoFerramenta = this.ferramentas.executarFuncao(        //passa os parammetros de execução do metodo de execução de ferramenta e se tudo for true armazena na variavel
+        //se chamada for false encerra o metodo
+        if (!chamada) return
+        //verifica se a chave usada para chaar a ferramenta existe em ferramentas e afirma que nao var ser undefined
+        if (!(nome! in Ferramentas.funcoes)) return "ferramenta invalida :("
+
+        //passa os parametros de execução da ferramenta e se der tudo certo armazena na variavel
+        const resultadoFerramenta = this.ferramentas.executarFuncao(
             chamada.function.name,
             chamada.function.arguments,
             chamada.id
         )
         console.log(resultadoFerramenta?.resultado)
 
-        this.transcritor.adicionar({        //chama o transcritor para armazenar esse resultado no historico
+        this.transcritor.adicionar({        //chama o transcritor para armazenar esse resultado no contexto
             papel: 'ferramenta',
             conteudo: resultadoFerramenta?.resultado!
         })
-         console.log(JSON.stringify(mensagem?.tool_calls, null, 2))
+        console.log(JSON.stringify(mensagem?.tool_calls, null, 2))
+    }
+
+    // * Responsavel por executar toda a sequencia de interações 
+    async executar()
+    {
+        this.salvarMensagem()
+        const resposta = await this.perguntarProvedor()
+        this.registrarResposta(resposta)
     }
 }
