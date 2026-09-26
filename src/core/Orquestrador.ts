@@ -24,7 +24,7 @@ export default class Orquestrador {
     }
 
     // * Função responsavel por receber a mensagem do usuario
-    public receberMensagem(conteudo: string) {
+    public async receberMensagem(conteudo: string) {
         this.mensagem = {
             papel: "usuario",
             conteudo
@@ -32,7 +32,7 @@ export default class Orquestrador {
 
         Debug.print(`Mensagem do usuario: ${conteudo}`)
 
-        this.executar()
+        return await this.executar()
     }
 
     // * Função responsavel por salvar a mensagem do usuario a cada interação
@@ -95,10 +95,11 @@ export default class Orquestrador {
     // ! tentar tirar o maximo possivel de ? e !
     private registrarFerramenta(mensagem: RespostaProvedor["choices"][number]["message"] | undefined) {
         const chamada = mensagem?.tool_calls?.[0]       //armazena a primeira chamada de tool_calls
-        const nome = chamada?.function.name;
+        if (!chamada) return
+        
+        const nome = chamada.function.name;
 
         //se chamada for false encerra o metodo
-        if (!chamada) return
         //verifica se a chave usada para chamar a ferramenta existe em ferramentas e afirma que nao var ser undefined
         if (!(nome! in Ferramentas.funcoes)) return "ferramenta invalida :("
 
