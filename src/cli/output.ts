@@ -1,17 +1,24 @@
 export class Output {
+
+    prompt() {
+        process.stdout.write("> ")
+    }
+
     resposta(conteudo: string) {
-        console.log(`[Feitiço]: ${conteudo}`)
+        console.log("\n[FEITIÇO]")
+        console.log(conteudo)
+        console.log()
     }
 
     sistema(conteudo: string) {
-        console.log(`[SISTEMA] ${conteudo}`)
+        console.log(`\n[SISTEMA] ${conteudo}\n`)
     }
 
     ferramenta(nome: string) {
-        console.log(`[FERRAMENTA] ${nome}`)
+        console.log(`\n[FERRAMENTA] ${nome}\n`)
     }
 
     erro(conteudo: string) {
-        console.error(`[ERRO] ${conteudo}`)
+        console.error(`\n[ERRO] ${conteudo}\n`)
     }
 }
