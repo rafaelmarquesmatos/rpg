@@ -25,32 +25,42 @@ function abrirJanela(script: string) {
 
 export default class Debug {
     private static socket: net.Socket | undefined
-     private static servidor: net.Server | undefined
+    private static servidor: net.Server | undefined     //* guarda a referencia ao servidor TCP criado
     private static fila: string[] = []
 
+    //* cria a conexão com o servidor TCP
     public static iniciar() {
         const servidor = net.createServer((conexao) => {
             Debug.socket = conexao
+
+            //* antes tinha a possibilidade de dar erro mas ninguem ouvia
+            conexao.on("error", (erro) => {
+                console.log("Erro na conexão do Debug:", erro.message)
+            })
+
             for (const texto of this.fila) {
                 conexao.write(texto + "\n")
             }
-            this.fila = []
+
+            //* a função nao precida depender de um contexto pra usar "this"
+            Debug.fila = []
         })
         
-        Debug.servidor = this.servidor
+        //*armazena esse endereco em uma variavel
+        Debug.servidor = servidor
         
-        servidor.listen(9876, "127.0.0.1", () => {
+        Debug.servidor.listen(9876, "127.0.0.1", () => {
             const script = fileURLToPath(new URL("../../../src/core/debug/janela.mjs", import.meta.url))
             abrirJanela(script)
         }) 
     }
-
+    //* fecha a conexão com o servidor TCP
     public static fechar(){
         Debug.socket?.destroy()
         Debug.servidor?.close()
     }
     
-    public static print(texto: string, separar?: Boolean) {
+    public static print(texto: string, separar?: boolean) {     //!estava Boolean 
         const final = separar ? `${texto}\n\n\n` : texto
 
         if (!Debug.socket) {
