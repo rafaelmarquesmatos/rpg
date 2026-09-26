@@ -25,6 +25,7 @@ function abrirJanela(script: string) {
 
 export default class Debug {
     private static socket: net.Socket | undefined
+     private static servidor: net.Server | undefined
     private static fila: string[] = []
 
     public static iniciar() {
@@ -35,13 +36,20 @@ export default class Debug {
             }
             this.fila = []
         })
-
+        
+        Debug.servidor = this.servidor
+        
         servidor.listen(9876, "127.0.0.1", () => {
             const script = fileURLToPath(new URL("../../../src/core/debug/janela.mjs", import.meta.url))
             abrirJanela(script)
         }) 
     }
 
+    public static fechar(){
+        Debug.socket?.destroy()
+        Debug.servidor?.close()
+    }
+    
     public static print(texto: string, separar?: Boolean) {
         const final = separar ? `${texto}\n\n\n` : texto
 
