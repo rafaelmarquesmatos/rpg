@@ -56,5 +56,21 @@
   {
     "papel": "assistente",
     "conteudo": "\n\nMeu nome é Rafael! E rolou 5 no dado kkkk"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "eae ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nEae! Tudo certo por aqui. E contigo?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "eae ?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nEae! Tudo certo por aqui. E com você?"
   }
 ]

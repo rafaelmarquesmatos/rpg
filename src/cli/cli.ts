@@ -11,7 +11,7 @@ export async function iniciar() {
     const orquestrador = new Orquestrador("25-09-18-26-ibrprz")
 
     while (true) {
-        const entrada = await input.receberMensgen()
+        const entrada = await input.receberMensagem()
 
         //* condição de parada, pq o tinha o rl.close mas o loop nunca cessava
         if( entrada === "/sair" ){
@@ -20,7 +20,7 @@ export async function iniciar() {
 
         const resposta = await orquestrador.receberMensagem(entrada)
         
-        output.resposta(resposta?.choices[0]?.message.content ?? "")
+        output.resposta(resposta)
     }
 
     Debug.fechar()

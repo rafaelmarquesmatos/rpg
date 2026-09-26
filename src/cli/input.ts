@@ -12,7 +12,7 @@ export class Input{
         output
     })
     //* espera e promete entregar ums string em algum momento
-    async receberMensgen(): Promise<string>{        
+    async receberMensagem(): Promise<string>{        
         return await this.rl.question("> ")
     }
     //! importante para liberar o recurso num esqueminha como "abrir -> usar -> liberar"

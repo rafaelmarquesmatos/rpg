@@ -122,17 +122,22 @@ export default class Orquestrador {
     }
 
     // * Responsavel por executar toda a sequencia de interações 
-    private async executar() {
+    private async executar(): Promise<string> {
         // Salvamos a mensagem do usuario
         this.salvarMensagem()
+
+        let ultima
 
         while (true) {
             const resposta = await this.perguntarProvedor()
             const temFerramenta = this.registrarResposta(resposta)
+            
+            ultima = resposta
 
             if (!temFerramenta) break
         }
 
         Debug.print('While do orquestrador finalizado', true)
+        return ultima.choices[0]?.message.content!
     }
 }
