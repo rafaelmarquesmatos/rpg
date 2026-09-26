@@ -5,9 +5,10 @@ import Provedor from "./Provedor.js";                                   //comuni
 import Transcritor from "./Transcritor.js";  
 
 export default class Orquestrador {
-    transcritor: Transcritor            //classe responsável pelo contexto.
-    provedor: Provedor                  //classe responsável por conversar com o modelo de IA.
-    ferramentas: Ferramentas
+    // * encapsulamento das propriedades
+    private readonly transcritor: Transcritor            //classe responsável pelo contexto.
+    private readonly provedor: Provedor                  //classe responsável por conversar com o modelo de IA.
+    private readonly ferramentas: Ferramentas
     mensagem: Mensagem            //classe statica responsável por executar ações solicitadas pelo modelo.
     log: boolean
     private observador?: (evento: EventoOrquestrador) => void | undefined
@@ -78,14 +79,24 @@ export default class Orquestrador {
             //*esse trecho trata caso o provedor retorne uma mensagen com content null ou sem tool_calls
             ...(mensagem.content? {conteudo: mensagem.content} : {}),                             
                             //* if          {true}          else {false}
-            ...(mensagem.tool_calls? {
-                    chamadas: mensagem.tool_calls.map((c) => ({
-                        id: c.id,
-                        nome: c.function.name,
-                        argumentos: JSON.parse(c.function.arguments) as Record<string, unknown>,
-                    })),
+            ...(mensagem.tool_calls
+                ? {
+                    chamadas: mensagem.tool_calls.map((c) => {
+                            const argumentos = this.analisarArgumentos(
+                                c.function.arguments                        //* podemos receber Record<string, unknown> ou undefined
+                            )
+
+                            if (!argumentos) return undefined               //* se for invalido ela não entra no historico
+
+                            return {                                        //*se for valido retorna isso
+                                id: c.id,
+                                nome: c.function.name,
+                                argumentos
+                            }
+                        })
+                        .filter((c): c is NonNullable<typeof c> => c !== undefined)     ///! essa paradinha é algo chamado type guard. Ele informa ao TypeScript. Depois deste filtro, considere que nenhum elemento é undefined.
                 }
-            : {}),
+                : {}),
 })
         /**
          * // ! precisa de uma melhoria aqui
@@ -156,5 +167,19 @@ export default class Orquestrador {
         }
     }
 
+    private analisarArgumentos(argumentos: string): Record<string, unknown> | undefined{
+        try{
+            const resultado: unknown = JSON.parse(argumentos)
+
+            if(typeof resultado !== "object" || resultado === null || Array.isArray(resultado)){
+                return undefined
+            }
+
+            return resultado as Record<string, unknown>
+        }
+        catch{
+            return undefined
+        }
+    }
    
 }

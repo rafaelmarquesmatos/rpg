@@ -27,10 +27,15 @@ export async function iniciar() {
         if( entrada === "/sair" ){
             break
         }
+        try{
+            const resposta = await orquestrador.receberMensagem(entrada)
 
-        const resposta = await orquestrador.receberMensagem(entrada)
+            output.resposta(resposta)
+        }
+        catch( erro ){
+            output.erro("...")
+        }
         
-        output.resposta(resposta)
     }
 
     Debug.fechar()
