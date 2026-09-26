@@ -1,15 +1,28 @@
-import { createInterface } from "node:readline/promises"
-import { stdin as input, stdout as output } from "node:process"
 import Orquestrador from "../core/Orquestrador.js";
+import { Input } from "./input.js"
+import { Output } from "./output.js"
+import Debug from "../core/debug/Debug.js"
 
+// !tirei os prints de terminal do orquestrador e joguei para ser excluivo de cli, mantendo os debug la
 export async function iniciar() {
-    const rl = createInterface({ input, output })
-
+    //* Instancia as calsses Input e Output
+    const input = new Input()
+    const output = new Output()
     const orquestrador = new Orquestrador("25-09-18-26-ibrprz")
 
     while (true) {
-        orquestrador.receberMensagem(await rl.question(""))
+        const entrada = await input.receberMensgen()
+
+        //* condição de parada, pq o tinha o rl.close mas o loop nunca cessava
+        if( entrada === "/sair" ){
+            break
+        }
+
+        const resposta = await orquestrador.receberMensagem(entrada)
+        
+        output.resposta(resposta?.choices[0]?.message.content ?? "")
     }
 
-    rl.close()
+    Debug.fechar()
+    input.fechar()
 }
