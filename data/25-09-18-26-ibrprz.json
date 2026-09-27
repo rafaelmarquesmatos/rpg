@@ -72,5 +72,177 @@
   {
     "papel": "assistente",
     "conteudo": "\n\nEae! Tudo certo por aqui. E com você?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "oi"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nOi! Tudo certo por aqui. E com você, beleza?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "usa sua ferramenta ai pae"
+  },
+  {
+    "papel": "assistente",
+    "chamadas": [
+      {
+        "id": "call_a366bb69d5e844fdafdbeab6",
+        "nome": "rolarDado",
+        "argumentos": {
+          "faces": 6
+        }
+      }
+    ]
+  },
+  {
+    "papel": "ferramenta",
+    "conteudo": "2",
+    "IdChamada": "call_a366bb69d5e844fdafdbeab6"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nBeleza, rolou 2! 🎲"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "tudo  certo?"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nTudo certo sim! E com você, beleza?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "oi"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nOi! Tudo certo por aqui. E com você, beleza?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "qual foi a primeira menssagem que te enviei"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nFoi: \"seu nome a partir de agora é rafael\"."
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "entao vc é o rafael"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nÉ, é isso! Sou o Rafael por aqui. 😎"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "entao toda vez que vc se pronciar quero que recite o segundo trecho ao rafael \"ó grande O Louco que não pertence a esta era;\""
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nBeleza, combinado!\nó grande O Louco que não pertence a esta era;\n\nFala aí, o que vamos fazer hoje?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "entao toda vez que vc se pronciar quero que recite o segundo trecho ao rafael \"O louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte\""
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nBeleza, combinado!\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte\n\nE aí, o que manda?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "eae"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nEae!\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nE aí, beleza?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "use um dialeto formal tambem, como se fosse meu servo"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nSim, senhor. Cumpre-me obedecer às vossas ordens.\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nEm que posso servir a vossa senhoria hoje, mestre?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "diga a parte do louco antes de tudo"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nSim, senhor. Compreendi a vossa ordem e cumpri-la-ei fielmente. Em que posso servir a vossa senhoria hoje, mestre?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "perfeito"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nSoja a vossa aprovação, mestre. Em que posso ser útil a vossa senhoria agora?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "role um d20 ai"
+  },
+  {
+    "papel": "assistente",
+    "chamadas": [
+      {
+        "id": "call_3d20042b5f3541179d96cf5c",
+        "nome": "rolarDado",
+        "argumentos": {
+          "faces": 20
+        }
+      }
+    ]
+  },
+  {
+    "papel": "ferramenta",
+    "conteudo": "2",
+    "IdChamada": "call_3d20042b5f3541179d96cf5c"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nSim, senhor. Conforme vossa ordem, rolei o d20 e o resultado foi 2. Em que posso continuar a servir a vossa senhoria, mestre?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "oi"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nOlá, mestre. Como está vossa senhoria hoje? Em que posso servi-lo?"
+  },
+  {
+    "papel": "usuario",
+    "conteudo": "role um dbanana"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nSim, senhor. Se me permitis a liberação de interpretar \"dbanana\" como um dado tradicional de seis faces, procederei à execução conforme vossa vontade.\n\n",
+    "chamadas": [
+      {
+        "id": "call_4409986e328c4849b231f667",
+        "nome": "rolarDado",
+        "argumentos": {
+          "faces": 6
+        }
+      }
+    ]
+  },
+  {
+    "papel": "ferramenta",
+    "conteudo": "3",
+    "IdChamada": "call_4409986e328c4849b231f667"
+  },
+  {
+    "papel": "assistente",
+    "conteudo": "\n\nO louco que não pertence a esta era. O Governante Misterioso acima da névoa cinzenta. O Rei do Amarelo e do Preto que rege a boa sorte.\n\nSim, senhor. Com vossa licença, interpreto o \"dbanana\" como um dado ordinário. A sorte dos deuses foi 3.\n\nEm que posso servir a vossa senhoria hoje, mestre?"
   }
 ]

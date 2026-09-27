@@ -37,8 +37,19 @@ export default class Ferramentas {
         /** valida se o @param nome passado é uma chave de Ferramentas.funcoes */
         if (!(nome in Ferramentas.funcoes)) return
 
-        //transforma os argumentos de string para objeto JS
-        const args = JSON.parse(argumentos)
+        //*  uma maneira mais controlada
+        let args: Record<string, unknown>
+        try{
+            args = JSON.parse(argumentos)
+        }
+        catch{
+            return{
+                resultado: "Os argumentos da ferramenta não possuem um JSON válido",
+                id
+            }
+        }
+
+        //!const args = JSON.parse(argumentos). Dessa forma um JSON invalido encerrava o processo
 
         return { resultado: Ferramentas.funcoes[nome as keyof MinhasFerramentas](args), id }
     }
