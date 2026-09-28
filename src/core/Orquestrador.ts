@@ -54,6 +54,7 @@ export default class Orquestrador {
     // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
     private async perguntarProvedor() {
         const respostaProvedor = await this.provedor.perguntar(this.transcritor.receber())
+
         return respostaProvedor
         /*
             *(this.provedor.perguntar) pede o historico ao transcritor e faz a requisição HTTP para a API
@@ -105,6 +106,8 @@ export default class Orquestrador {
         if (mensagem.content) {
             Debug.print(`Resposta do assistente: ${mensagem.content}`)    
         }
+
+        if( mensagem.tool_calls )
         
         if (mensagem.tool_calls?.[0]) {
             // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
@@ -125,8 +128,8 @@ export default class Orquestrador {
         //*verifica se a chave usada para chamar a ferramenta existe em ferramentas 
         if (!(nome in Ferramentas.funcoes)) return
 
-        this.observador?.({
-            tipo: 'ferramentas',
+        this.emitirEvento({
+            tipo: "ferramenta",
             nome
         })
 
@@ -149,10 +152,20 @@ export default class Orquestrador {
         Debug.print(JSON.stringify(mensagem.tool_calls, null, 2))
     }
 
+    private emitirEvento(evento: EventoOrquestrador){
+        if(this.observador){
+            this.observador(evento)
+        }
+    }
+
     // * Responsavel por executar toda a sequencia de interações 
     private async executar() {
         // Salvamos a mensagem do usuario
         this.salvarMensagem()
+
+        this.emitirEvento({
+            tipo: "inicio"
+        })
 
         while (true) {
         
@@ -162,6 +175,10 @@ export default class Orquestrador {
             if (!temFerramenta){
                 Debug.print("While do orquestrador finalizado", true)  // * è aqui chefe, fora do if tava tava dentro do loop
                 
+                this.emitirEvento({
+                    tipo: "fim"
+                })
+
                 return resposta.choices[0]?.message.content ?? " ";
             } 
         }

@@ -13,7 +13,7 @@ export class Input{
     })
     //* espera e promete entregar ums string em algum momento
     async receberMensagem(): Promise<string>{        
-        return await this.rl.question("")
+        return await this.rl.question( "> " )
     }
     //! importante para liberar o recurso num esqueminha como "abrir -> usar -> liberar"
     fechar(){
@@ -24,4 +24,11 @@ export class Input{
         //* permite que o processo termine mesmo que stdin ainda exista como handle ativo
         input.unref()
     }
+    pausar(){
+        input.pause()
+    }
+    retomar(){
+        input.resume()
+    }
+
 }

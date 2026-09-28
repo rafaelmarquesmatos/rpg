@@ -26,9 +26,16 @@ interface RespostaProvedor {
     choices: Array<{ message: { content: string | null, tool_calls?: ChamadaFerramenta[]}}>
 }
 
- export type EventoOrquestrador = {
-        tipo: "ferramentas",
+ export type EventoOrquestrador = 
+    | {
+        tipo: "inicio"
+    }
+    | {
+        tipo: "ferramenta"
         nome: string
+    }
+    | {
+        tipo: "fim"
     }
 
 export type { RespostaProvedor }

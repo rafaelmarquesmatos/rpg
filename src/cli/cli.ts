@@ -1,8 +1,9 @@
-import Orquestrador from "../core/Orquestrador.js";
 import { Input } from "./input.js"
 import { Output } from "./output.js"
-import Debug from "../core/debug/Debug.js"
+import { Comandos } from "./comandos.js"
+import Orquestrador from "../core/Orquestrador.js";
 import Ferramentas from "../core/Ferramentas.js";
+import Debug from "../core/debug/Debug.js"
 
 // !tirei os prints de terminal do orquestrador e joguei para ser excluivo de cli, mantendo os debug la
 export async function iniciar() {
@@ -12,32 +13,70 @@ export async function iniciar() {
     const orquestrador = new Orquestrador(
         "25-09-18-26-ibrprz",
         (evento) => {
-            if(evento.tipo === "ferramentas"){
-                output.ferramenta(evento.nome)
+            switch( evento.tipo ){
+                case "inicio":
+                    output.iniciarProcessamento()
+                    break
+                case "ferramenta":
+                    output.ferramenta(evento.nome)
+                    break
+                case "fim":
+                    output.finalizarProcessamento()
+                    break
             }
         }
     )
 
-    while (true) {
-        output.prompt()
-        
-        const entrada = await input.receberMensagem()
+    output.limparTerminal()
 
-        //* condição de parada, pq o tinha o rl.close mas o loop nunca cessava
-        if( entrada === "/sair" ){
-            break
-        }
-        try{
-            const resposta = await orquestrador.receberMensagem(entrada)
+    try{        //*se o loop fechar inesperadamente garante que os recusos serão fechados
+        while (true) {
+                const entrada = await input.receberMensagem()
 
-            output.resposta(resposta)
-        }
-        catch( erro ){
-            output.erro("...")
-        }
-        
+                //* gancho para implementar comandos mais elaborados
+                const comando = Comandos.identificaodr(entrada)
+                if( comando ){
+                    switch( comando ){
+                        case "sair":
+                            return
+                        case "ajuda":
+                            output.sistema("Comandos disponiveis: /ajuda, /sair")
+                            continue
+                        case "desconhecido":
+                            output.erro(`Comando não reconhecido: ${entrada}`)
+                            continue
+                    }
+
+                    break
+                }
+                
+
+                //*exibe a entrada do usuario
+                output.usuario(entrada)
+
+                input.pausar()
+
+                try{    //* trata o erro de um mensagem individual                                                                
+                    const resposta = await orquestrador.receberMensagem(entrada)
+
+                    output.resposta(resposta)
+                }
+                catch( erro ){
+                    if( erro instanceof Error ){            //* verifica se o objeto armazenado em erro é uma instancia de Error
+                        output.erro(erro.message)
+                    }
+                    else{
+                        output.erro(String(erro))           //* converte o valor para string caso nao for
+                    }
+                }
+                finally{
+                    input.retomar()
+                }
+                
+            }
     }
-
-    Debug.fechar()
-    input.fechar()
+    finally{
+        Debug.fechar()
+        input.fechar()
+    }
 }
