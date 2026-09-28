@@ -14,7 +14,6 @@ export class Output {
     private quadro = 0
 
     usuario(conteudo: string){
-        process.stdout.write("\x1b[2J\x1b[3J\x1b[H")
         console.log(`[USUARIO]\n\n${conteudo}\n`)
     }
 
@@ -26,8 +25,6 @@ export class Output {
     }
 
     sistema(conteudo: string) {
-        process.stdout.write("\x1b[2J\x1b[3J\x1b[H")
-
         console.log(`\n[SISTEMA] ${conteudo}\n`)
     }
 
@@ -36,14 +33,12 @@ export class Output {
 
         console.log(`[MEMORIA]\n\n${nome}\n`)
 
-        this.iniciarProcessamento
+        this.iniciarProcessamento()
     }
 
     erro(conteudo: string) {
         this.finalizarProcessamento()
-        //? apaga tudo do terminal e bota no inicio acho q seria uma boa pro debug ja que ele exibe um array que vai sendo incrementado com o JSON
-        process.stdout.write("\x1b[2J\x1b[3J\x1b[H")
-
+    
         console.error(`\n[ERRO] ${conteudo}\n`)
     }
 

@@ -2,7 +2,6 @@ import { Input } from "./input.js"
 import { Output } from "./output.js"
 import { Comandos } from "./comandos.js"
 import Orquestrador from "../core/Orquestrador.js";
-import Ferramentas from "../core/Ferramentas.js";
 import Debug from "../core/debug/Debug.js"
 
 // !tirei os prints de terminal do orquestrador e joguei para ser excluivo de cli, mantendo os debug la
@@ -34,26 +33,41 @@ export async function iniciar() {
                 const entrada = await input.receberMensagem()
 
                 //* gancho para implementar comandos mais elaborados
-                const comando = Comandos.identificaodr(entrada)
+                const comando = Comandos.identificador(entrada)
                 if( comando ){
                     switch( comando ){
                         case "sair":
                             return
                         case "ajuda":
-                            output.sistema("Comandos disponiveis: /ajuda, /sair")
+                            output.sistema("Comandos disponiveis: /ajuda, /sair, /limpar, /debug, /!debug")
                             continue
                         case "desconhecido":
                             output.erro(`Comando não reconhecido: ${entrada}`)
                             continue
+                        case "limpar":
+                            output.limparTerminal()
+                            continue
+                        //! nao aguentava mais abrir aquela segunda janela toda hora
+                        case "debug":
+                            Debug.iniciar()
+                            continue
+                        case "!debug":
+                            Debug.fechar()
+                            continue
                     }
-
-                    break
                 }
                 
 
                 //*exibe a entrada do usuario
                 output.usuario(entrada)
 
+
+                /**
+                 * Pausamos o Input enquanto o agente trabalha.
+                 *
+                 * Isso evita que outra entrada seja processada
+                 * durante uma execução assíncrona.
+                */
                 input.pausar()
 
                 try{    //* trata o erro de um mensagem individual                                                                
@@ -72,8 +86,7 @@ export async function iniciar() {
                 finally{
                     input.retomar()
                 }
-                
-            }
+        }
     }
     finally{
         Debug.fechar()
