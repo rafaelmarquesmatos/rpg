@@ -1,9 +1,9 @@
-export type Comando = "sair" | "ajuda" | "desconhecido"
+export type Comando = "sair" | "ajuda" | "debug" | "!debug"| "desconhecido"
 
 export class Comandos{
 
-    static identificaodr(entrada: string): Comando | undefined{
-        const texto = entrada.trim()
+    static identificador(entrada: string): Comando | undefined{
+        const texto = entrada.trim()        //*remove os espaçoes antes depois
 
         if( !texto.startsWith("/") ){
             return undefined
@@ -16,13 +16,14 @@ export class Comandos{
             case "/ajuda":
                 return "ajuda"
 
+            case "/debug":
+                return "debug"
+                
+            case "/!debug":
+                return "!debug"
+
             default:
                 return "desconhecido"
         }
-
-    }
-
-    static ehComando(entrada: string) : boolean{
-        return entrada.startsWith("/")
     }
 }

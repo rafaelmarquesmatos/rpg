@@ -48,12 +48,14 @@ export default class Orquestrador {
     private salvarMensagem() //usa o metodo do transcritor para armazenar a mensagem que o Orquestrador recebeu no transcritor
     {
         this.transcritor.adicionar(this.mensagem)
-        Debug.print(`Salvando no transcritor: ${JSON.stringify(this.mensagem, null, 2)}`)
+        //! achei melhor exibir o estado inteiro do array no debug
+       // Debug.print(`Salvando no transcritor: ${JSON.stringify(this.mensagem, null, 2)}`)
     }
 
     // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
     private async perguntarProvedor() {
-        const respostaProvedor = await this.provedor.perguntar(this.transcritor.receber())
+        const historico = this.transcritor.receber()
+        const respostaProvedor = await this.provedor.perguntar(historico)
 
         return respostaProvedor
         /*
@@ -63,6 +65,13 @@ export default class Orquestrador {
         */
     }
 
+    /**
+    * !Esse metodo tem tres funções
+    * 
+    *! 1. Extrair a mensagem retornada pelo modelo.
+    *! 2. Salvar essa mensagem no histórico do Transcritor.
+    *! 3. Verificar se o modelo solicitou alguma ferramenta. 
+    */
     // ! tentar tirar o maximo possivel de ? e !
     private registrarResposta(resposta: RespostaProvedor) //Receber a resposta do Provedor, extrair a mensagem da IA, salvar essa mensagem no histórico e verificar se a IA pediu alguma ferramenta.
     {
@@ -71,13 +80,28 @@ export default class Orquestrador {
             *(.message) declara para pegar o content do array
         */
         const mensagem = resposta.choices[0]?.message
-        if(!mensagem) return    //* se não houver mensagen retorna. ajuda a tirar parte dos "?"
+        //* se não houver mensagen retorna falso. ajuda a tirar parte dos "?"
+        if(!mensagem) return    
         
-        // * monta uma mensagen e salva no transcritor
+        // * monta uma mensagen da IA e salva no transcritor ( Historico )
         this.transcritor.adicionar({
             papel: 'assistente',
 
-            //*esse trecho trata caso o provedor retorne uma mensagen com content null ou sem tool_calls
+            /**
+                ** Algumas respostas possuem texto.
+                *
+                ** Outras possuem somente `tool_calls`.
+                *
+                ** Por isso só adicionamos `conteudo`
+                ** quando realmente existe conteúdo.
+                *
+                ** Isso também evita colocar:
+                *
+                *! conteudo: undefined
+                *
+                ** no objeto, algo especialmente relevante
+                *!porque o projeto utiliza `exactOptionalPropertyTypes`.
+            */
             ...(mensagem.content? {conteudo: mensagem.content} : {}),                             
                             //* if          {true}          else {false}
             ...(mensagem.tool_calls
@@ -95,7 +119,8 @@ export default class Orquestrador {
                                 argumentos
                             }
                         })
-                        .filter((c): c is NonNullable<typeof c> => c !== undefined)     ///! essa paradinha é algo chamado type guard. Ele informa ao TypeScript. Depois deste filtro, considere que nenhum elemento é undefined.
+                        //! essa paradinha é algo chamado type guard. Ele informa ao TypeScript. Depois deste filtro, considere que nenhum elemento é undefined.//! essa paradinha é algo chamado type guard. Ele informa ao TypeScript. Depois deste filtro, considere que nenhum elemento é undefined.
+                        .filter((c): c is NonNullable<typeof c> => c !== undefined)     
                 }
                 : {}),
 })
@@ -104,11 +129,9 @@ export default class Orquestrador {
          */
         
         if (mensagem.content) {
-            Debug.print(`Resposta do assistente: ${mensagem.content}`)    
+           Debug.print(`Resposta do assistente: ${mensagem.content}`)    
         }
 
-        if( mensagem.tool_calls )
-        
         if (mensagem.tool_calls?.[0]) {
             // TODO: Atualmente registrarResposta tá chamando o registrarFerramenta para ver se tem uma ferramenta e não tem muito sentido kkk
             this.registrarFerramenta(mensagem)
@@ -168,11 +191,17 @@ export default class Orquestrador {
         })
 
         while (true) {
-        
+            //*armazena o estado atual do array depois de cada interação
+            const historico = this.transcritor.receber()
+            
             const resposta = await this.perguntarProvedor()
             const temFerramenta = this.registrarResposta(resposta)
 
             if (!temFerramenta){
+                //*limpa o debuger pra exibir o array atualizado
+                Debug.limpar()
+                //*printa o array
+                Debug.print(`Historico atual:\n${JSON.stringify(historico, null, 2)}`)
                 Debug.print("While do orquestrador finalizado", true)  // * è aqui chefe, fora do if tava tava dentro do loop
                 
                 this.emitirEvento({
