@@ -1,4 +1,3 @@
-import { clear } from "node:console"
 import type { iniciar } from "./cli.js"
 
 export class Output {
@@ -12,34 +11,51 @@ export class Output {
     
     //* qual animação mostrar
     private quadro = 0
+    //*padroniza a exibição no terminal
+    private secao( titulo: string, conteudo: string ){
+        console.log(`[${titulo}]`)
+        console.log()
+        console.log(conteudo)
+        console.log()
+    }
+
+    iniciarTurno(){
+        this.finalizarProcessamento()
+
+        process.stdout.write("\x1b[2J\x1b[3J\x1b[H")
+
+        console.log("=====================================================================")
+        console.log("                         RPG AGENT")
+        console.log("=====================================================================")
+        console.log()
+    }
+
+    limparLinha(){
+        process.stdout.write("\r\x1b[K")
+    }
 
     usuario(conteudo: string){
-        console.log(`[USUARIO]\n\n${conteudo}\n`)
+        this.secao("USUARIO", conteudo)
     }
 
     resposta(conteudo: string) {
         this.finalizarProcessamento()
-
-        console.log(`[FEITICO] ${conteudo}`)
-        console.log()
+        this.secao("FEITICO", conteudo)
     }
 
     sistema(conteudo: string) {
-        console.log(`\n[SISTEMA] ${conteudo}\n`)
+        this.secao("SISTEMA", conteudo)
     }
 
     ferramenta(nome: string) {
         this.finalizarProcessamento()
-
-        console.log(`[MEMORIA]\n\n${nome}\n`)
-
+        this.secao("MEMORIA", nome)
         this.iniciarProcessamento()
     }
 
     erro(conteudo: string) {
         this.finalizarProcessamento()
-    
-        console.error(`\n[ERRO] ${conteudo}\n`)
+        this.secao("ERRO", conteudo)
     }
 
     iniciarProcessamento(){
@@ -80,9 +96,5 @@ export class Output {
 
         //*volta para o inicio da linha e apaga o conteudo dela
         process.stdout.write("\r\x1b[K")
-    }
-
-    limparTerminal(){
-        process.stdout.write("\x1b[2J\x1b[3J\x1b[H")
     }
 }

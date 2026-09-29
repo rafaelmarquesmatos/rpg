@@ -48,12 +48,14 @@ export default class Orquestrador {
     private salvarMensagem() //usa o metodo do transcritor para armazenar a mensagem que o Orquestrador recebeu no transcritor
     {
         this.transcritor.adicionar(this.mensagem)
-        Debug.print(`Salvando no transcritor: ${JSON.stringify(this.mensagem, null, 2)}`)
+        //! achei melhor exibir o estado inteiro do array no debug
+       // Debug.print(`Salvando no transcritor: ${JSON.stringify(this.mensagem, null, 2)}`)
     }
 
     // * Função responsavel por encaminhar o contexto atual para o provedor e esperar uma resposta
     private async perguntarProvedor() {
-        const respostaProvedor = await this.provedor.perguntar(this.transcritor.receber())
+        const historico = this.transcritor.receber()
+        const respostaProvedor = await this.provedor.perguntar(historico)
 
         return respostaProvedor
         /*
@@ -189,11 +191,17 @@ export default class Orquestrador {
         })
 
         while (true) {
-        
+            //*armazena o estado atual do array depois de cada interação
+            const historico = this.transcritor.receber()
+            
             const resposta = await this.perguntarProvedor()
             const temFerramenta = this.registrarResposta(resposta)
 
             if (!temFerramenta){
+                //*limpa o debuger pra exibir o array atualizado
+                Debug.limpar()
+                //*printa o array
+                Debug.print(`Historico atual:\n${JSON.stringify(historico, null, 2)}`)
                 Debug.print("While do orquestrador finalizado", true)  // * è aqui chefe, fora do if tava tava dentro do loop
                 
                 this.emitirEvento({

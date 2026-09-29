@@ -70,4 +70,15 @@ export default class Debug {
 
         Debug.socket.write(final + "\n")
     }
+
+    public static limpar(){
+        const comando = "\x1b[2J\x1b[3J\x1b[H"
+
+        if ( !Debug.socket ){
+            Debug.fila.push( comando )
+            return
+        }
+
+        Debug.socket.write(comando + "\n")
+    }
 }

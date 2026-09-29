@@ -26,12 +26,15 @@ export async function iniciar() {
         }
     )
 
-    output.limparTerminal()
 
     try{        //*se o loop fechar inesperadamente garante que os recusos serão fechados
         while (true) {
-                const entrada = await input.receberMensagem()
-
+            
+            const entrada = await input.receberMensagem()
+            
+                //*toda vez que um dialogo der um ciclo completo ele redesenha a tela
+                output.iniciarTurno()
+                
                 //* gancho para implementar comandos mais elaborados
                 const comando = Comandos.identificador(entrada)
                 if( comando ){
@@ -39,17 +42,15 @@ export async function iniciar() {
                         case "sair":
                             return
                         case "ajuda":
-                            output.sistema("Comandos disponiveis: /ajuda, /sair, /limpar, /debug, /!debug")
+                            output.sistema("Comandos disponiveis: /ajuda, /sair, /debug, /!debug")
                             continue
                         case "desconhecido":
                             output.erro(`Comando não reconhecido: ${entrada}`)
                             continue
-                        case "limpar":
-                            output.limparTerminal()
-                            continue
                         //! nao aguentava mais abrir aquela segunda janela toda hora
                         case "debug":
                             Debug.iniciar()
+                            Debug.print("Debug ativado", true)
                             continue
                         case "!debug":
                             Debug.fechar()
@@ -86,7 +87,7 @@ export async function iniciar() {
                 finally{
                     input.retomar()
                 }
-        }
+            }
     }
     finally{
         Debug.fechar()

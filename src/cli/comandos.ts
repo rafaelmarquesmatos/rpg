@@ -1,4 +1,4 @@
-export type Comando = "sair" | "ajuda" | "limpar" | "debug" | "!debug"| "desconhecido"
+export type Comando = "sair" | "ajuda" | "debug" | "!debug"| "desconhecido"
 
 export class Comandos{
 
@@ -15,10 +15,10 @@ export class Comandos{
 
             case "/ajuda":
                 return "ajuda"
-            case "/limpar":
-                return "limpar"
+
             case "/debug":
                 return "debug"
+                
             case "/!debug":
                 return "!debug"
 
